@@ -1,0 +1,44 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+.Python
+
+# Flask instance folder & local databases
+instance/
+*.db
+*.sqlite3
+
+# Environment files
+.env
+.env.*
+
+# Alembic (DB migrations) cache
+migrations/__pycache__/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# IDEs & editors
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
