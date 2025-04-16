@@ -1,28 +1,9 @@
-FROM python:3.9-slim as builder
-
-WORKDIR /app
-
-COPY requirements.txt /app/
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    libffi-dev \
-    build-essential \
-    && pip install --no-cache-dir -r requirements.txt \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-FROM python:3.9-slim
-
-WORKDIR /app
-
-COPY --from=builder /app /app
-
-COPY . .
-
-ENV FLASK_APP=app.py
-
+FROM python:3.10
 EXPOSE 5000
-
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
-
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+ENV FLASK_APP=app.py
+RUN pip list
+CMD ["flask", "run", "--host", "0.0.0.0"]
