@@ -41,6 +41,9 @@ class Transaction(db.Model):
     type = db.Column(db.String(50), nullable=False)  
     amount = db.Column(db.Float, nullable=False)
     currency = db.Column(db.String(3), nullable=False, default='USD')
+    currency_from = db.Column(db.String(3), nullable=True)  
+    currency_to = db.Column(db.String(3), nullable=True) 
+    converted_amount = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     target_user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
 

@@ -6,3 +6,7 @@ flask-migrate
 psycopg2-binary
 python-dotenv
 flask-cors
+pytest
+pytest-flask
+flasgger
+
