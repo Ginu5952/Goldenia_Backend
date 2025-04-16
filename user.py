@@ -180,16 +180,16 @@ def transfer():
     }), 200
 
 
-#@user_bp.route('/profile', methods=['GET'])
-#@jwt_required()
-#def get_profile():
-  #  identity = get_jwt_identity()
-   # user = User.query.get(identity)
-  #  return jsonify({
-   #     "id": user.id,
-   #     "username": user.username,
-   #     "balance": user.balance
-  #  })
+@user_bp.route('/profile', methods=['GET'])
+@jwt_required()
+def get_profile():
+    identity = get_jwt_identity()
+    user = User.query.get(identity)
+    return jsonify({
+       "id": user.id,
+        "username": user.username,
+        "balance": user.balance
+    })
 
 # Transaction History
 #-----------------#
