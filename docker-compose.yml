@@ -6,11 +6,11 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
-      - DATABASE_URL=postgresql://goldenia_user:goldenia@goldenia-db:5432/goldenia_wallet
-      - SECRET_KEY=1bb9a403198971af7527077471eb7fe47aac40eebac4314f
-      - SQLALCHEMY_TRACK_MODIFICATIONS=False
+      - FLASK_APP
+      - FLASK_ENV
+      - DATABASE_URL
+      - SECRET_KEY
+      - SQLALCHEMY_TRACK_MODIFICATIONS
     depends_on:
       - db
     volumes:
