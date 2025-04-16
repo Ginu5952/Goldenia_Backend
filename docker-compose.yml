@@ -1,0 +1,28 @@
+
+services:
+  backend:
+    build: .
+    container_name: goldenia-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://goldenia_user:goldenia@goldenia-db:5432/goldenia_wallet
+      - SECRET_KEY=1bb9a403198971af7527077471eb7fe47aac40eebac4314f
+      - SQLALCHEMY_TRACK_MODIFICATIONS=False
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+
+  db:
+    image: postgres:15-alpine
+    platform: linux/amd64 
+    container_name: goldenia-db
+    environment:
+      POSTGRES_DB: goldenia_wallet
+      POSTGRES_USER: goldenia_user
+      POSTGRES_PASSWORD: goldenia
+    ports:
+      - "5432:5432"
