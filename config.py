@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'defaultsecret')  # default if not found
-    JWT_SECRET_KEY = os.getenv('SECRET_KEY', 'defaultsecret')  # JWT Secret Key (same as Flask)
+    SECRET_KEY = os.getenv('SECRET_KEY', 'defaultsecret')  
+    JWT_SECRET_KEY = os.getenv('SECRET_KEY', 'defaultsecret') 
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False)

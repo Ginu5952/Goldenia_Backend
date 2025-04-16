@@ -118,7 +118,7 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({'message': 'Invalid email or password'}), 401
 
-    # Use only user.id as identity (must be a string, int, or UUID)
+   
     access_token = create_access_token(identity=str(user.id))
 
     role = 'admin' if user.is_admin else 'user'
