@@ -231,80 +231,93 @@ def get_profile():
 def get_transactions():
   
     """
-    Get the history of transactions for the authenticated user.
-    
-    ---
-    tags:
-      - User
-    responses:
-      200:
-        description: Successfully retrieved the user's transactions
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                transactions:
-                  type: array
-                  description: A list of transaction objects
-                  items:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        description: The transaction ID
-                        example: 1
-                      type:
-                        type: string
-                        description: The type of transaction (e.g., top_up, exchange, transfer)
-                        example: "top_up"
-                      amount:
-                        type: number
-                        description: The amount involved in the transaction
-                        example: 50.00
-                      currency_from:
-                        type: string
-                        description: The currency from which funds are being moved (for exchange and transfer types)
-                        example: "USD"
-                      currency_to:
-                        type: string
-                        description: The currency to which funds are being moved (for exchange and transfer types)
-                        example: "EUR"
-                      converted_amount:
-                        type: number
-                        description: The converted amount for exchange transactions
-                        example: 45.00
-                      target_user_id:
-                        type: integer
-                        description: The ID of the target user (for transfers)
-                        example: 3
-                      currency_symbol:
-                        type: string
-                        description: The symbol of the currency (e.g., $, €, etc.)
-                        example: "$"
-                      currency:
-                        type: string
-                        description: The currency used in the transaction
-                        example: "USD"
-                      balance:
-                        type: number
-                        description: The balance after the transaction is applied
-                        example: 150.00
-                      timestamp:
-                        type: string
-                        description: The timestamp when the transaction was created
-                        example: "2025-04-25T12:00:00"
-                      to:
-                        type: string
-                        description: The recipient of the transfer (if applicable)
-                        example: "50.00$"
-                      target_username:
-                        type: string
-                        description: The username of the target user (for transfers)
-                        example: "roy"
-      404:
-        description: User not found
-    """
+Get the history of transactions for the authenticated user.
+
+---
+tags:
+  - User
+responses:
+  200:
+    description: Successfully retrieved the user's transactions
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            transactions:
+              type: array
+              description: A list of transaction objects
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The transaction ID
+                    example: 1
+                  type:
+                    type: string
+                    description: The type of transaction (e.g., top_up, exchange, transfer)
+                    example: "top_up"
+                  amount:
+                    type: number
+                    description: The amount involved in the transaction
+                    example: 50.00
+                  currency_from:
+                    type: string
+                    description: The source currency (for exchanges)
+                    example: "USD"
+                  currency_to:
+                    type: string
+                    description: The target currency (for exchanges)
+                    example: "EUR"
+                  converted_amount:
+                    type: number
+                    description: The converted amount for exchange transactions
+                    example: 45.00
+                  currency_symbol:
+                    type: string
+                    description: The symbol of the currency (e.g., $, €, etc.)
+                    example: "€"
+                  currency:
+                    type: string
+                    description: The currency used in the transaction
+                    example: "EUR"
+                  balance:
+                    type: number
+                    description: The balance after the transaction
+                    example: 150.00
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: The timestamp when the transaction was created
+                    example: "2025-04-25T12:00:00"
+                  status:
+                    type: string
+                    description: The status of the transaction (credited or debited)
+                    example: "credited"
+                  to:
+                    type: string
+                    description: The recipient details (for sent transfers)
+                    example: "50.00€"
+                  received_from:
+                    type: string
+                    description: The sender's username (for received transfers)
+                    example: "roy"
+                  target_user_id:
+                    type: integer
+                    nullable: true
+                    description: The ID of the target user (for sent transfers)
+                    example: 3
+                  target_username:
+                    type: string
+                    nullable: true
+                    description: The username of the target user (for sent transfers)
+                    example: "roy"
+  404:
+    description: User not found
+"""
+
+
     
     identity = get_jwt_identity()
     user = User.query.get(int(identity))
@@ -314,7 +327,9 @@ def get_transactions():
 
     transactions = (
         Transaction.query
-        .filter(Transaction.user_id == user.id)
+        .filter(
+            (Transaction.user_id == user.id) | (Transaction.target_user_id == user.id)
+        )
         .order_by(Transaction.created_at.asc())  
         .all()
     )
@@ -330,18 +345,47 @@ def get_transactions():
         if currency not in user_balances:
           user_balances[currency] = 0.0
 
+        status = "unknown"  
+
         if t.type == "top_up":
            
           user_balances[currency] += t.amount
+          status = "credited"
            
         elif t.type == "exchange" and t.converted_amount:
            
             user_balances[t.currency_from] = user_balances.get(t.currency_from, 0) - t.amount
             user_balances[t.currency_to] = user_balances.get(t.currency_to, 0) + t.converted_amount
+            status = "debited" if t.currency_from == currency else "credited"
 
         elif t.type == "transfer":
-            user_balances[t.currency_from] = user_balances.get(t.currency_from, 0) - t.amount
-           
+            if t.target_user_id == user.id:  # This means the user is the recipient
+                user_balances[t.currency] += t.amount
+                status = "credited"
+            else:  # This means the user is the sender
+                user_balances[t.currency] -= t.amount
+                status = "debited"
+
+        if t.type == "transfer":
+            if t.target_user_id == user.id:
+                direction_field = {
+                    "received_from": t.user.username if t.user else None,
+                    "target_user_id": None,
+                    "target_username": None
+                }
+            else:
+                direction_field = {
+                    "to": f"{t.amount:.2f}{t.currency_symbol}",
+                    "target_user_id": t.target_user_id,
+                    "target_username": t.target_user.username if t.target_user else None
+                }
+        else:
+            direction_field = {
+                "to": "-",
+                "target_user_id": None,
+                "target_username": None
+            }        
+
         transactions_response.append({
             "id": t.id,
             "type": t.type,
@@ -355,7 +399,9 @@ def get_transactions():
             "balance": round(user_balances[t.currency], 2),
             "timestamp": t.created_at.isoformat(),
             "to": f"{t.amount:.2f}{t.currency_symbol}" if t.type == "transfer" else "-",
-            "target_username": t.target_user.username if t.target_user_id else None
+            "target_username": t.target_user.username if t.target_user_id else None,
+            "status": status ,
+            **direction_field,
         })
 
     transactions_response.reverse()
