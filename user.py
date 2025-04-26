@@ -322,8 +322,12 @@ def transfer():
     if amount <= 0:
         return jsonify({"message": "Amount must be greater than 0"}), 400
 
-    current_user = User.query.get(current_user_id)
-    target_user = User.query.get(target_user_id)
+   # current_user = User.query.get(current_user_id)
+   # target_user = User.query.get(target_user_id)
+
+    current_user = db.session.get(User, current_user_id)
+    target_user = db.session.get(User, target_user_id)
+
 
     if not current_user or not target_user:
         return jsonify({"message": "User not found"}), 404
