@@ -9,7 +9,8 @@ import os
 
 from models import db
 from auth import auth_bp  
-from user import user_bp, admin_bp
+from user import user_bp
+from admin import admin_bp
 
 # Load environment variables from .env file
 load_dotenv()

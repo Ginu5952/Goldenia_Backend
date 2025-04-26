@@ -4,7 +4,7 @@ from models import db, User, Transaction, UserBalance
 from datetime import datetime
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
-admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
 
 def get_currency_symbol(currency: str):
     if currency == "USD":
@@ -192,7 +192,8 @@ def get_transactions():
             "currency": t.currency,
             "balance": round(user_balances[t.currency], 2),
             "timestamp": t.created_at.isoformat(),
-            "to": f"{t.amount:.2f}{t.currency_symbol}" if t.type == "transfer" else "-"
+            "to": f"{t.amount:.2f}{t.currency_symbol}" if t.type == "transfer" else "-",
+            "target_username": t.target_user.username if t.target_user_id else None
         })
 
     transactions_response.reverse()
@@ -327,3 +328,5 @@ def transfer():
         "target_username": target_user.username ,
         "amount": round(amount, 2)
     }), 200
+
+
