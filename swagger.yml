@@ -1,0 +1,535 @@
+swagger: "2.0"
+info:
+  title: Goldenia Wallet API
+  description: API documentation for Goldenia Wallet
+  version: "1.0"
+host: localhost:5000
+basePath: /
+schemes:
+  - http
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'"
+security:
+  - Bearer: []
+
+paths:
+  /auth/signup:
+    post:
+      summary: Signup
+      tags:
+        - Authentication
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - username
+              - email
+              - password
+            properties:
+              username:
+                type: string
+                example: jinu
+              email:
+                type: string
+                example: jinu@example.com
+              password:
+                type: string
+                example: password123
+      responses:
+        201:
+          description: User created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: User created successfully
+        400:
+          description: Missing required fields
+        409:
+          description: User already exists
+
+  /auth/login:
+    post:
+      summary: Login
+      tags:
+        - Authentication
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                example: jinu@example.com
+              password:
+                type: string
+                example: password123
+      responses:
+        200:
+          description: Successful login
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+              role:
+                type: string
+        401:
+          description: Invalid email or password
+
+  /user/profile:
+    get:
+      summary: Get user profile with balances
+      tags:
+        - User
+      responses:
+        200:
+          description: Successfully retrieved user profile and balances
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: User ID
+                example: 1
+              username:
+                type: string
+                description: Username of the user
+                example: "johndoe"
+              balances:
+                type: array
+                description: List of the user's balances for different currencies
+                items:
+                  type: object
+                  properties:
+                    currency:
+                      type: string
+                      description: Currency type (e.g., USD, EUR)
+                      example: "USD"
+                    amount:
+                      type: number
+                      description: Amount in the respective currency
+                      example: 150.00
+                    symbol:
+                      type: string
+                      description: Currency symbol
+                      example: "$"
+        404:
+          description: User not found
+
+  /user/top-up:
+    post:
+      summary: Top up the user's balance
+      tags:
+        - User
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: The amount to top-up for the user
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: number
+                description: Amount to top up
+                example: 50
+      responses:
+        200:
+          description: Balance updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+                    description: Updated balance after top-up
+                    example: 150.00
+                  currency_symbol:
+                    type: string
+                    description: Currency symbol
+                    example: "$"
+                  message:
+                    type: string
+                    description: Response message
+                    example: "Top-up successful"
+        400:
+          description: Invalid amount
+        404:
+          description: User not found
+
+  /user/transfer:
+    post:
+      summary: Transfer amount from the authenticated user to another user
+      tags:
+        - User
+      parameters:
+        - in: body
+          name: transfer
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: number
+                description: The amount to transfer
+                example: 50.0
+              target_user_id:
+                type: integer
+                description: The ID of the target user
+                example: 2
+              currency:
+                type: string
+                description: The currency for the transfer
+                example: "USD"
+      responses:
+        200:
+          description: Transfer was successful and balances were updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+                    example: "Transfer successful"
+                  balance:
+                    type: number
+                    description: Updated balance of the authenticated user
+                    example: 150.0
+                  currency:
+                    type: string
+                    description: Currency of the balance
+                    example: "USD"
+                  target_user_id:
+                    type: integer
+                    description: The ID of the target user
+                    example: 2
+                  target_username:
+                    type: string
+                    description: Username of the target user
+                    example: "janedoe"
+                  amount:
+                    type: number
+                    description: Amount transferred
+                    example: 50.0
+        400:
+          description: Invalid or missing parameters, or insufficient balance
+        404:
+          description: User not found
+
+  /user/exchange:
+    post:
+      summary: Exchange currencies for the authenticated user
+      tags:
+        - User
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: number
+                example: 50
+              currency_from:
+                type: string
+                example: "USD"
+              currency_to:
+                type: string
+                example: "EUR"
+      responses:
+        200:
+          description: Exchange was successful and balances were updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Response message
+                    example: "Exchange successful"
+                  converted_amount:
+                    type: number
+                    description: The amount after the currency conversion
+                    example: 42.5
+                  balance_from:
+                    type: number
+                    description: Updated balance of the `currency_from` after conversion
+                    example: 100.0
+                  balance_to:
+                    type: number
+                    description: Updated balance of the `currency_to` after conversion
+                    example: 42.5
+                  currency_from:
+                    type: string
+                    description: The original currency used for exchange
+                    example: "USD"
+                  currency_to:
+                    type: string
+                    description: The currency received after exchange
+                    example: "EUR"
+                  currency_symbol:
+                    type: string
+                    description: Currency symbol (e.g., "$", "€")
+                    example: "$"
+        400:
+          description: Invalid amount or currency pair
+        404:
+          description: User not found
+
+  /user/transactions:
+    get:
+      summary: Get the history of transactions for the authenticated user
+      tags:
+        - User
+      responses:
+        200:
+          description: Successfully retrieved the user's transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    description: A list of transaction objects
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: The transaction ID
+                          example: 1
+                        type:
+                          type: string
+                          description: The type of transaction (e.g., top_up, exchange, transfer)
+                          example: "top_up"
+                        amount:
+                          type: number
+                          description: The amount involved in the transaction
+                          example: 50.00
+                        currency_from:
+                          type: string
+                          description: The source currency (for exchanges)
+                          example: "USD"
+                        currency_to:
+                          type: string
+                          description: The target currency (for exchanges)
+                          example: "EUR"
+                        converted_amount:
+                          type: number
+                          description: The converted amount for exchange transactions
+                          example: 45.00
+                        currency_symbol:
+                          type: string
+                          description: The symbol of the currency (e.g., $, €, etc.)
+                          example: "€"
+                        currency:
+                          type: string
+                          description: The currency used in the transaction
+                          example: "EUR"
+                        balance:
+                          type: number
+                          description: The balance after the transaction
+                          example: 150.00
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: The timestamp when the transaction was created
+                          example: "2025-04-25T12:00:00"
+                        status:
+                          type: string
+                          description: The status of the transaction (credited or debited)
+                          example: "credited"
+                        to:
+                          type: string
+                          description: The recipient details (for sent transfers)
+                          example: "50.00€"
+                        received_from:
+                          type: string
+                          description: The sender's username (for received transfers)
+                          example: "roy"
+                        target_user_id:
+                          type: integer
+                          nullable: true
+                          description: The ID of the target user (for sent transfers)
+                          example: 3
+                        target_username:
+                          type: string
+                          nullable: true
+                          description: The username of the target user (for sent transfers)
+                          example: "roy"
+        404:
+          description: User not found
+
+  /admin/user/{id}:
+    get:
+      summary: Get user info by ID (Admin only)
+      description: Retrieve detailed information about a user by their ID. Only accessible by admin users.
+      tags:
+        - Admin
+      security:
+        - Bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          description: ID of the user to retrieve
+      responses:
+        200:
+          description: Successfully retrieved user
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: User ID
+              username:
+                type: string
+                description: Username
+              email:
+                type: string
+                description: User email
+              balances:
+                type: array
+                description: User balances for each currency
+                items:
+                  type: object
+                  properties:
+                    currency:
+                      type: string
+                      description: Currency code (e.g., USD, EUR)
+                    balance:
+                      type: number
+                      format: float
+                      description: Balance in the currency
+              is_admin:
+                type: boolean
+                description: Whether the user is an admin
+              created_at:
+                type: string
+                format: date-time
+                description: Account creation timestamp
+        403:
+          description: Access forbidden
+        404:
+          description: User not found
+
+  /admin/transactions:
+    get:
+      summary: Retrieve transaction history by user id (Admin only)
+      description: >
+        Allows admin users to view transaction history for all users or a specific user.
+        Includes transaction type, amount, currency, status, balance after each transaction,
+        sender and receiver details (if applicable).
+      tags:
+        - Admin
+      security:
+        - Bearer: []
+      produces:
+        - application/json
+      parameters:
+        - name: user_id
+          in: query
+          type: integer
+          required: false
+          description: User ID to fetch transactions for a specific user. If not provided, fetches all users' transactions.
+        - name: page
+          in: query
+          type: integer
+          required: false
+          default: 1
+          description: Page number for pagination.
+        - name: page_size
+          in: query
+          type: integer
+          required: false
+          default: 20
+          description: Number of transactions per page.
+      responses:
+        200:
+          description: A paginated list of transactions
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    type:
+                      type: string
+                    amount:
+                      type: number
+                      format: float
+                    currency:
+                      type: string
+                    currency_symbol:
+                      type: string
+                    timestamp:
+                      type: string
+                      format: date-time
+                    status:
+                      type: string
+                    balance:
+                      type: number
+                      format: float
+                    to:
+                      type: string
+                    received_from:
+                      type: string
+                    target_user:
+                      type: object
+                      properties:
+                        target_user_id:
+                          type: integer
+                        target_username:
+                          type: string
+                    currency_from:
+                      type: string
+                    currency_to:
+                      type: string
+                    converted_amount:
+                      type: number
+                      format: float
+              total:
+                type: integer
+              page:
+                type: integer
+              pages:
+                type: integer
+              user_id:
+                type: integer
+              username:
+                type: string
+        403:
+          description: Access forbidden - Admins only

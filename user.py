@@ -33,49 +33,7 @@ def get_all_users():
 @user_bp.route("/top-up", methods=["POST"])
 @jwt_required()
 def top_up():
-    """
-    Top up the user's balance.
-    
-    ---
-    tags:
-      - User
-    parameters:
-      - in: body
-        name: body
-        description: The amount to top-up for the user
-        required: true
-        schema:
-          type: object
-          properties:
-            amount:
-              type: number
-              description: Amount to top up
-              example: 50
-    responses:
-      200:
-        description: Balance updated successfully
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                balance:
-                  type: number
-                  description: Updated balance after top-up
-                  example: 150.00
-                currency_symbol:
-                  type: string
-                  description: Currency symbol
-                  example: "$"
-                message:
-                  type: string
-                  description: Response message
-                  example: "Top-up successful"
-      400:
-        description: Invalid amount
-      404:
-        description: User not found
-    """
+   
     identity = get_jwt_identity()
     user = User.query.get(int(identity))
 
@@ -161,49 +119,7 @@ def top_up():
 @user_bp.route('/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
-    """
-    Get user profile with balances.
     
-    ---
-    tags:
-      - User
-    responses:
-      200:
-        description: Successfully retrieved user profile and balances
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  description: User ID
-                  example: 1
-                username:
-                  type: string
-                  description: Username of the user
-                  example: "johndoe"
-                balances:
-                  type: array
-                  description: List of the user's balances for different currencies
-                  items:
-                    type: object
-                    properties:
-                      currency:
-                        type: string
-                        description: Currency type (e.g., USD, EUR)
-                        example: "USD"
-                      amount:
-                        type: number
-                        description: Amount in the respective currency
-                        example: 150.00
-                      symbol:
-                        type: string
-                        description: Currency symbol
-                        example: "$"
-      404:
-        description: User not found
-    """
     identity = get_jwt_identity()
     user = User.query.get(identity)
 
@@ -229,96 +145,7 @@ def get_profile():
 @user_bp.route("/transactions", methods=["GET"])
 @jwt_required()
 def get_transactions():
-  
-    """
-Get the history of transactions for the authenticated user.
 
----
-tags:
-  - User
-responses:
-  200:
-    description: Successfully retrieved the user's transactions
-    content:
-      application/json:
-        schema:
-          type: object
-          properties:
-            transactions:
-              type: array
-              description: A list of transaction objects
-              items:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: The transaction ID
-                    example: 1
-                  type:
-                    type: string
-                    description: The type of transaction (e.g., top_up, exchange, transfer)
-                    example: "top_up"
-                  amount:
-                    type: number
-                    description: The amount involved in the transaction
-                    example: 50.00
-                  currency_from:
-                    type: string
-                    description: The source currency (for exchanges)
-                    example: "USD"
-                  currency_to:
-                    type: string
-                    description: The target currency (for exchanges)
-                    example: "EUR"
-                  converted_amount:
-                    type: number
-                    description: The converted amount for exchange transactions
-                    example: 45.00
-                  currency_symbol:
-                    type: string
-                    description: The symbol of the currency (e.g., $, €, etc.)
-                    example: "€"
-                  currency:
-                    type: string
-                    description: The currency used in the transaction
-                    example: "EUR"
-                  balance:
-                    type: number
-                    description: The balance after the transaction
-                    example: 150.00
-                  timestamp:
-                    type: string
-                    format: date-time
-                    description: The timestamp when the transaction was created
-                    example: "2025-04-25T12:00:00"
-                  status:
-                    type: string
-                    description: The status of the transaction (credited or debited)
-                    example: "credited"
-                  to:
-                    type: string
-                    description: The recipient details (for sent transfers)
-                    example: "50.00€"
-                  received_from:
-                    type: string
-                    description: The sender's username (for received transfers)
-                    example: "roy"
-                  target_user_id:
-                    type: integer
-                    nullable: true
-                    description: The ID of the target user (for sent transfers)
-                    example: 3
-                  target_username:
-                    type: string
-                    nullable: true
-                    description: The username of the target user (for sent transfers)
-                    example: "roy"
-  404:
-    description: User not found
-"""
-
-
-    
     identity = get_jwt_identity()
     user = User.query.get(int(identity))
 
@@ -414,56 +241,7 @@ responses:
 @user_bp.route('/exchange', methods=['POST'])
 @jwt_required()
 def exchange_currency():
-    """
-    Exchange currencies for the authenticated user.
-    
-    ---
-    tags:
-      - User
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          properties:
-            amount:
-              type: number
-              example: 50
-            currency_from:
-              type: string
-              example: "USD"
-            currency_to:
-              type: string
-              example: "EUR"
-    responses:
-      200:
-        description: Exchange was successful and balances were updated
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                converted_amount:
-                  type: number
-                balance_from:
-                  type: number
-                balance_to:
-                  type: number
-                currency_from:
-                  type: string
-                currency_to:
-                  type: string
-                currency_symbol:
-                  type: string
-      400:
-        description: Invalid amount or currency pair
-      404:
-        description: User not found
-    
-    """
+   
     identity = get_jwt_identity()
     user = User.query.get(identity)
 
@@ -532,56 +310,7 @@ def exchange_currency():
 @user_bp.route('/transfer', methods=['POST'])
 @jwt_required()
 def transfer():
-    """
-    Transfer amount from the authenticated user to another user.
-
-    ---
-    tags:
-      - User
-    parameters:
-      - in: body
-        name: transfer
-        required: true
-        schema:
-          type: object
-          properties:
-            amount:
-              type: number
-              description: The amount to transfer
-              example: 50.0
-            target_user_id:
-              type: integer
-              description: The ID of the target user
-              example: 2
-            currency:
-              type: string
-              description: The currency for the transfer
-              example: "USD"
-    responses:
-      200:
-        description: Transfer was successful and balances were updated
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                balance:
-                  type: number
-                currency:
-                  type: string
-                target_user_id:
-                  type: integer
-                target_username:
-                  type: string
-                amount:
-                  type: number
-      400:
-        description: Invalid or missing parameters, or insufficient balance
-      404:
-        description: User not found
-    """
+   
     current_user_id = get_jwt_identity()
     data = request.get_json()
     amount = data.get('amount')

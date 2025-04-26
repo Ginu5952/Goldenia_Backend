@@ -7,50 +7,6 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
 
-    """
-    User Signup
-    ---
-    tags:
-      - Authentication
-    consumes:
-      - application/json
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          required:
-            - username
-            - email
-            - password
-          properties:
-            username:
-              type: string
-              example: jinu
-            email:
-              type: string
-              example: jinu@example.com
-            password:
-              type: string
-              example: password123
-    responses:
-      201:
-        description: User created successfully
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                  example: User created successfully
-      400:
-        description: Missing required fields
-      409:
-        description: User already exists
-    """
-
     data = request.get_json()
     username = data.get('username')
     email = data.get('email')
@@ -72,43 +28,7 @@ def signup():
 @auth_bp.route('/login', methods=['POST'])
 def login():
    
-    """
-    User Login
-    ---
-    tags:
-      - Authentication
-    consumes:
-      - application/json
-    parameters:
-      - in: body
-        name: body
-        required: true
-        schema:
-          type: object
-          required:
-            - email
-            - password
-          properties:
-            email:
-              type: string
-              example: jinu@example.com
-            password:
-              type: string
-              example: password123
-    responses:
-      200:
-        description: Successful login
-        schema:
-          type: object
-          properties:
-            access_token:
-              type: string
-            role:
-              type: string
-      401:
-        description: Invalid email or password
-    """
-    
+   
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')

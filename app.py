@@ -31,27 +31,7 @@ jwt = JWTManager(app)
 CORS(app)
 
 
-swagger = Swagger(app, template={
-    "swagger": "2.0",
-    "info": {
-        "title": "Goldenia Wallet API",
-        "description": "API documentation for Goldenia Wallet",
-        "version": "1.0"
-    },
-    "securityDefinitions": {
-        "Bearer": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header",
-            "description": "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'"
-        }
-    },
-    "security": [
-        {
-            "Bearer": []
-        }
-    ]
-})
+swagger = Swagger(app, template_file='swagger.yml')
 
 
 app.register_blueprint(auth_bp)  
