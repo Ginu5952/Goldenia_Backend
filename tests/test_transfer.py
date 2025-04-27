@@ -1,6 +1,7 @@
 import unittest
 from tests.base_test import BaseTestCase
-from models import User, UserBalance
+from models.user import User
+from models.user_balance import UserBalance
 from app import db
 
 class TransferTestCase(BaseTestCase):

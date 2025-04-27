@@ -69,8 +69,11 @@ psql -U yourusername -d goldenia_wallet
 ### Create .env File
 In your root directory create a .env file
 ```
-DATABASE_URL=postgresql://your_user:your_pass@localhost:5432/your_db
+FLASK_APP=run.py
+FLASK_DEBUG=1
 SECRET_KEY=your_secret_key
+DATABASE_URL=postgresql://your_user:your_password@localhost:5432/your_db
+SQLALCHEMY_TRACK_MODIFICATIONS=False
 ````
 
 ### Set Up Database
@@ -79,6 +82,14 @@ SECRET_KEY=your_secret_key
 flask db init
 flask db migrate
 flask db upgrade
+```
+
+# Note:- To set the first user as an admin
+```
+psql -U yourusername -d goldenia_wallet
+UPDATE "user"
+SET is_admin = 't'  
+WHERE id = 1;
 ```
 
 ### Run the Server

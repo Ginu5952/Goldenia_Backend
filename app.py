@@ -7,9 +7,11 @@ from flasgger import Swagger
 from dotenv import load_dotenv
 import os
 
-from models import db
+from models.user import db
 from auth import auth_bp  
-from user import user_bp
+from controllers.user_controller import user_bp
+from controllers.exchange_controller import exchange_bp
+from controllers.transaction_controller import transaction_bp
 from admin import admin_bp
 
 # Load environment variables from .env file
@@ -41,7 +43,9 @@ def create_app(config_name="development"):
 
 
     app.register_blueprint(auth_bp)  
-    app.register_blueprint(user_bp, url_prefix='/user')
+    app.register_blueprint(user_bp)
+    app.register_blueprint(exchange_bp)
+    app.register_blueprint(transaction_bp)
     app.register_blueprint(admin_bp)
 
     @app.route('/')

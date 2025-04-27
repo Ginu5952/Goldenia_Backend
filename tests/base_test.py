@@ -1,6 +1,5 @@
 import unittest
 from app import create_app, db
-from models import User, UserBalance
 from flask_jwt_extended import create_access_token
 
 class BaseTestCase(unittest.TestCase):
