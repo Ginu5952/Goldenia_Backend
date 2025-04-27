@@ -92,11 +92,22 @@ class TransferTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
 
         with self.app.app_context():
+            sender = User.query.filter_by(username="lowbalance").first()
             receiver = User.query.filter_by(username="richuser").first()
+
+            # Set up balances manually
+            sender_balance = UserBalance(user_id=sender.id, currency="USD", balance=10.0)  # Small balance
+            receiver_balance = UserBalance(user_id=receiver.id, currency="USD", balance=50.0)
+
+            db.session.add(sender_balance)
+            db.session.add(receiver_balance)
+            db.session.commit()
+
+            receiver_id = receiver.id 
 
         # Try to transfer too much
         transfer_data = {
-            "target_user_id": receiver.id,
+            "target_user_id": receiver_id,
             "amount": 1000,  
             "currency": "USD"
         }

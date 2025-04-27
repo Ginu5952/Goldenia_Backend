@@ -20,9 +20,6 @@ def top_up():
         result
     ), 200
 
-   
-
-
 
 @transaction_bp.route("/transfer", methods=["POST"])
 @jwt_required()
@@ -34,11 +31,14 @@ def transfer():
     target_user_id = data.get('target_user_id')
     currency = data.get('currency') 
 
-    
     result = TransactionService.transfer(current_user_id,target_user_id, amount,currency)
-    return jsonify(
-        result
-    ), 200
+
+    if isinstance(result, tuple):
+        response_data, status_code = result
+        return jsonify(response_data), status_code
+    else:
+        return jsonify(result), 200
+
 
 
 @transaction_bp.route("/transactions", methods=["GET"])
@@ -48,7 +48,7 @@ def get_transactions():
     identity = get_jwt_identity()
     user = User.query.get(int(identity))
 
-    result = TransactionService.transaction(identity,user)
+    result = TransactionService.transaction(user)
     return jsonify(
         result
     ), 200

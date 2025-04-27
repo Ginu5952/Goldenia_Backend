@@ -51,9 +51,9 @@ class TransactionService:
 
    
         if not all([amount, target_user_id, currency]):
-            return jsonify({"message": "Amount, target_user_id, and currency are required"}), 400
+            return {"message": "Amount, target_user_id, and currency are required"}, 400
         if amount <= 0:
-            return jsonify({"message": "Amount must be greater than 0"}), 400
+            return {"message": "Amount must be greater than 0"}, 400
 
         # current_user = User.query.get(current_user_id)
         # target_user = User.query.get(target_user_id)
@@ -63,14 +63,14 @@ class TransactionService:
 
 
         if not current_user or not target_user:
-            return jsonify({"message": "User not found"}), 404
+            return {"message": "User not found"}, 404
 
     
         sender_balance = UserBalance.query.filter_by(user_id=current_user.id, currency=currency).first()
         receiver_balance = UserBalance.query.filter_by(user_id=target_user.id, currency=currency).first()
 
         if not sender_balance or sender_balance.balance < amount:
-            return jsonify({"message": "Insufficient balance"}), 400
+            return {"message": "Insufficient balance"}, 400
 
     
         if not receiver_balance:
