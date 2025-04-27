@@ -14,11 +14,11 @@ def top_up():
     data = request.get_json()
     amount = data.get("amount")
  
-    result = TransactionService.top_up(identity, amount)
+    result,status_code = TransactionService.top_up(identity, amount)
     
     return jsonify(
         result
-    ), 200
+    ), status_code
 
 
 @transaction_bp.route("/transfer", methods=["POST"])
@@ -48,10 +48,10 @@ def get_transactions():
     identity = get_jwt_identity()
     user = User.query.get(int(identity))
 
-    result = TransactionService.transaction(user)
+    result,status_code = TransactionService.transaction(user)
     return jsonify(
         result
-    ), 200
+    ), status_code
 
    
 

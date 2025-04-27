@@ -16,7 +16,5 @@ def exchange_currency():
     currency_from = data.get('currency_from')
     currency_to = data.get('currency_to')
 
-    result = ExchangeService.exchange(user, amount, currency_from, currency_to)
-    return jsonify(
-            result
-        ), 200
+    result, status_code = ExchangeService.exchange(user, amount, currency_from, currency_to)
+    return jsonify(result), status_code

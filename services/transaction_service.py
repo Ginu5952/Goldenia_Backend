@@ -44,7 +44,7 @@ class TransactionService:
             "balance": round(user_balance.balance, 2),
             "currency_symbol": "$",
             "message": "Top-up successful",
-        }
+        },200
 
     @staticmethod
     def transfer(current_user_id, target_user_id, amount, currency):
@@ -70,7 +70,7 @@ class TransactionService:
         receiver_balance = UserBalance.query.filter_by(user_id=target_user.id, currency=currency).first()
 
         if not sender_balance or sender_balance.balance < amount:
-            return {"message": "Insufficient balance"}, 400
+            return {"message": f"Insufficient balance in {currency}"}, 400
 
     
         if not receiver_balance:
@@ -101,7 +101,7 @@ class TransactionService:
             "target_user_id": target_user.id,
             "target_username": target_user.username ,
             "amount": round(amount, 2)
-        }
+        },200
     
 
     @staticmethod
@@ -193,4 +193,4 @@ class TransactionService:
 
         return{
             "transactions": transactions_response
-        }
+        },200

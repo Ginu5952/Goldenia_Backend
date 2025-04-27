@@ -10,13 +10,13 @@ class ExchangeService:
     def exchange(user,amount, currency_from,  currency_to ):
          
         if not user:
-            return jsonify({"message": "User not found"}), 404
+            return {"message": "User not found"}, 404
 
     
         if not amount or amount <= 0:
-            return jsonify({"message": "Amount must be greater than zero"}), 400
+            return {"status": "error","message": "Amount must be greater than zero"}, 400
         if currency_from == currency_to:
-            return jsonify({"message": "Currencies must be different"}), 400
+            return {"status": "error", "message": "Currencies must be different"}, 400
 
         exchange_rates = {
             ("USD", "EUR"): 0.88,
@@ -24,14 +24,15 @@ class ExchangeService:
         }
 
         rate = exchange_rates.get((currency_from, currency_to))
+
         if not rate:
-            return jsonify({"message": "Currency pair not supported"}), 400
+            return { "status": "error","message": "Currency pair not supported"}, 400
 
         balance_from = next((b for b in user.balances if b.currency == currency_from), None)
         balance_to = next((b for b in user.balances if b.currency == currency_to), None)
 
         if not balance_from or balance_from.balance < amount:
-            return jsonify({"message": f"Insufficient balance in {currency_from}"}), 400
+            return {"status": "error", "message": f"Insufficient balance in {currency_from}"}, 400
 
         if not balance_to:
             balance_to = UserBalance(user_id=user.id, currency=currency_to, balance=0.0)
@@ -65,6 +66,6 @@ class ExchangeService:
             "currency_from": currency_from,
             "currency_to": currency_to,
             "currency_symbol": get_currency_symbol(currency_to)
-        }
+        },200
 
 
