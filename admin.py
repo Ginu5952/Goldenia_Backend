@@ -42,6 +42,7 @@ def get_all_transactions_by_id():
    
     identity = get_jwt_identity()
     admin_user = User.query.get(identity)
+    
     if not admin_user or not admin_user.is_admin:
         return jsonify({"message": "Access forbidden: Admins only"}), 403
 
@@ -56,30 +57,31 @@ def get_all_transactions_by_id():
             (Transaction.user_id == user_id) | (Transaction.target_user_id == user_id)
         )
 
-    pagination = query.order_by(Transaction.created_at.desc()).paginate(page=page, per_page=page_size, error_out=False)
+    pagination = query.order_by(Transaction.created_at.asc()).paginate(page=page, per_page=page_size, error_out=False)
     transactions = pagination.items
 
     transactions_response = []
 
-    usd_balance = 0  # <-- Initialize separately
+    usd_balance = 0 
     eur_balance = 0
+    
 
-    # Loop through each transaction to prepare the response
-    for t in reversed(transactions):  # Reverse to calculate balance from oldest to latest
+   
+    for t in transactions:  
         sender = User.query.get(t.user_id)
         receiver = User.query.get(t.target_user_id) if t.target_user_id else None
 
-        # Determine status
+      
         if t.type == "transfer":
-            if user_id:  # If specific user_id requested
+            if user_id:  
                 if t.user_id == user_id:
                     status = "debited"
                 elif t.target_user_id == user_id:
                     status = "credited"
                 else:
-                    status = "debited"  # Default for admin view
+                    status = "debited"  
             else:
-                status = "debited"  # Default when no specific user
+                status = "debited"  
         else:
             status = "credited" if t.type == "top_up" else "debited"
 
@@ -93,7 +95,7 @@ def get_all_transactions_by_id():
             "status": status,
         }
 
-        # Handle transaction type
+       
         if t.type == "transfer":
             if status == "debited":
                 if receiver:

@@ -105,7 +105,7 @@ class TransactionService:
     
 
     @staticmethod
-    def transaction(identity,user):
+    def transaction(user):
 
         if not user:
             return jsonify({"error": "User not found"}), 404
