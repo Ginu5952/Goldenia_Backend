@@ -27,8 +27,8 @@ Make sure you have the following installed:
 ### 1. Clone the Repository
 #### Open your terminal and run following commands 
 ```bash
-git clone https://github.com/Ginu5952/Goldenia_Backend.git
-cd Goldenia_Backend
+git clone https://github.com/Ginu5952/goldenia-backend.git
+cd goldenia-backend
 code .
 ```
 
@@ -82,12 +82,6 @@ Once the containers are running, you can access the application:
 Backend (API): http://127.0.0.1:5000
 
 
-# 📑 Swagger Docs
-
-Available at:
-http://127.0.0.1:5000/apidocs/
-
-* Use Bearer token from login response to test protected endpoints
 
 
 
