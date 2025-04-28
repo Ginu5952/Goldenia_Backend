@@ -14,6 +14,14 @@ Flask-based REST API for the Goldenia Wallet app. Supports user registration, lo
 - CORS
 - dotenv
 
+## Prerequisites
+
+Make sure you have the following installed:
+
+- [Docker](https://www.docker.com/get-started) (for running containers)
+- [Docker Compose](https://docs.docker.com/compose/install/) (to manage multi-container apps)
+
+
 ## 📦 Setup Instructions
 
 ### 1. Clone the Repository
@@ -24,81 +32,55 @@ cd Goldenia_Backend
 code .
 ```
 
-### 2. Create Virtual Environment and Install Dependencies
-Run following commands in Terminal
+## Update the .env file:
+
+
+SECRET_KEY: This is a Flask security key for sessions and other cryptographic operations. You should generate a secure key.
+
+To generate a secure SECRET_KEY, run the following command in your terminal:
+
 ```
-python -m venv venv
-source venv/bin/activate     # on Windows: venv\Scripts\activate
-pip install -r requirements.txt
+python3 -c 'import secrets; print(secrets.token_hex(24))'
+
+```
+
+Copy the generated string and paste it into the .env file 
+
+```
+SECRET_KEY=your-secure-secret-key
+
+```
+SECRET_KEY
+
+DATABASE_URL: Docker will automatically create and configure the PostgreSQL database for you.
+
+Update the DATABASE_URL in the .env file. Replace the placeholders with your own values:
+```
+DATABASE_URL=postgresql://your-user-name:your-password@db:5432/your-db-name
+
+```
+`your-database-username`: Username for your PostgreSQL database (e.g., goldenia_user).
+
+`your-database-password`: Password for your PostgreSQL user (e.g., goldenia).
+
+`your-database-name`: The name of your database (e.g., goldenia_wallet).
+
+`Note: The db part in the DATABASE_URL refers to the Docker service name for PostgreSQL in your docker-compose.yml file. Docker will automatically handle the internal networking.`
+
+### Start the application with Docker Compose
+Run the following command to build and start the Docker containers:
+
+```
+docker-compose up --build
 ````
+This command will build Docker images for the frontend, backend, and database, and start all services inside Docker containers.
 
-# PostgreSQL Setup Guide
+## Access the Application
 
-## 1. Install PostgreSQL
+Once the containers are running, you can access the application:
 
-To install PostgreSQL, follow the instructions for your operating system:
+Backend (API): http://127.0.0.1:5000
 
-- **[PostgreSQL Downloads](https://www.postgresql.org/download/)**  
-  (Choose your OS: macOS, Windows, or Linux)
-
-For macOS, you can use Homebrew:
-```bash
-brew install postgresql
-```
-Check the installed version:
-```
-psql --version
-```
-Log in to PostgreSQL:
-```
-psql -U yourusername -d postgres
-```
-
-Create a new database:
-```
-CREATE DATABASE goldenia_wallet;
-\q
-```
-
-Connect to your new database:
-```
-psql -U yourusername -d goldenia_wallet
-```
-
-
-### Create .env File
-In your root directory create a .env file
-```
-FLASK_APP=run.py
-FLASK_DEBUG=1
-SECRET_KEY=your_secret_key
-DATABASE_URL=postgresql://your_user:your_password@localhost:5432/your_db
-SQLALCHEMY_TRACK_MODIFICATIONS=False
-````
-
-### Set Up Database
-
-```
-flask db init
-flask db migrate
-flask db upgrade
-```
-
-# Note:- To set the first user as an admin
-```
-psql -U yourusername -d goldenia_wallet
-UPDATE "user"
-SET is_admin = 't'  
-WHERE id = 1;
-```
-
-### Run the Server
-```
-flask run
-# or
-python app.py
-```
-Server will run at: http://127.0.0.1:5000/
 
 # 📑 Swagger Docs
 
