@@ -7,9 +7,7 @@ __pycache__/
 
 # Virtual Environments
 venv/
-env/
 .venv/
-ENV/
 .Python
 
 # Flask Instance Folder & Local Databases
@@ -17,10 +15,7 @@ instance/
 *.db
 *.sqlite3
 
-# Environment Variables
-.env
-.env.*
-*.env
+
 
 # Config & Secret Files
 config.yaml
