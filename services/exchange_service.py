@@ -19,8 +19,8 @@ class ExchangeService:
             return {"status": "error", "message": "Currencies must be different"}, 400
 
         exchange_rates = {
-            ("USD", "EUR"): 0.88,
-            ("EUR", "USD"): 1.14,
+            ("USD", "EUR"): 0.87896,
+            ("EUR", "USD"): 1.1379,
         }
 
         rate = exchange_rates.get((currency_from, currency_to))
@@ -49,8 +49,8 @@ class ExchangeService:
             currency_from=currency_from,
             currency_to=currency_to,
             converted_amount=converted_amount,
-            currency=currency_to,
-            currency_symbol=get_currency_symbol(currency_to)
+            currency=currency_from,
+            currency_symbol=get_currency_symbol(currency_from)
         )
 
         db.session.add(transaction)

@@ -181,7 +181,12 @@ class TransactionService:
                 "target_user_id": t.target_user_id,
                 "currency_symbol": t.currency_symbol,
                 "currency": t.currency,
-                "balance": round(user_balances[t.currency], 2),
+               "balance": round(
+                    user_balances[t.currency_from] if t.type == "exchange" and t.currency_from == t.currency 
+                    else user_balances[t.currency_to] if t.type == "exchange" 
+                    else user_balances[t.currency],
+                    2
+                ),
                 "timestamp": t.created_at.isoformat(),
                 "to": f"{t.amount:.2f}{t.currency_symbol}" if t.type == "transfer" else "-",
                 "target_username": t.target_user.username if t.target_user_id else None,
